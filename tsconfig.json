@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es6",
+        "declaration": false,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "allowUnreachableCode": false,
+        "noImplicitReturns": true,
+        "charset": "utf8"
+    },
+    "files": [
+        "app.ts",
+        "appender.ts",
+        "assistant.ts"
+    ]
+}

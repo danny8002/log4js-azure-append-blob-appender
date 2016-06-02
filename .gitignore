@@ -1,0 +1,10 @@
+obj
+objd
+
+node_modules
+.idea
+.vs
+.tscache
+.ntvs_analysis.dat
+*.js.map
+*.js
