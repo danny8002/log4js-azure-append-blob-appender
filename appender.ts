@@ -112,17 +112,3 @@ function loadSelfModule(): any {
   var file = __filename;
   return require(file);
 }
-
-(function overwriteLog4jsConfigure() {
-
-  var oldLoader = log4js_.loadAppender;
-
-  log4js_.loadAppender = function (
-    appenderType: string,
-    appenderModule: log4js_.AppenderModule): void {
-    if (appenderModule == undefined && appenderType === module.exports.name) {
-      appenderModule = loadSelfModule();
-    }
-    return oldLoader(appenderType, appenderModule);
-  }
-})();

@@ -1,8 +1,14 @@
 # git #
 .git*
+.vscode
+.tscache
 
 # Node #
 node_modules/
+
+# TypeScript files #
+*.ts
+*.js.map
 
 # Test #
 test/
