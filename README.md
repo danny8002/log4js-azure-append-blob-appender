@@ -22,7 +22,7 @@ npm install log4js-azure-append-blob-appender --save
 ```
 
 ## usage:
-This appender is compitable with log4js configuration file. for example, in your log4js configuration file (log4js.cfg.json)
+This appender is **compitable** with log4js configuration file. for example, in your log4js configuration file (log4js.cfg.json)
 
 ```javascript
 {
@@ -51,7 +51,7 @@ This appender is compitable with log4js configuration file. for example, in your
     
     var log = log4js.getLogger("YOUR_CATEGORY");
     
-    lg.debug("my msg", "data1");
+    log.debug("my msg", "data1");
     
 ```
 # About Configuration
