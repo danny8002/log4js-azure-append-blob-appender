@@ -34,13 +34,9 @@
     "log4js": "^0.6.36"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-cli": "^1.1.0",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-jshint": "^1.0.0",
-    "grunt-contrib-nodeunit": "^1.0.0",
-    "grunt-contrib-watch": "^1.0.0",
-    "grunt-ts": "^5.5.0-beta.2",
-    "typescript": "^1.8.9"
+    "grunt": "~0.4.5",
+    "grunt-ts": "~5.5.0-beta.2",
+    "typescript": "~1.8.9",
+    "grunt-mocha": "^1.0.2"
   }
 }

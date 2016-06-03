@@ -23,6 +23,14 @@ export interface AzureAppendBlobAppenderOptions extends log4js_.AppenderConfigBa
 }
 
 
+function validateField(name: string, value: string) {
+  var _v = value;
+  if (_v == null
+    || typeof _v !== 'string'
+    || _v.length <= 0) {
+    throw new TypeError("[" + name + "] must be a valid string but get " + (typeof _v));
+  }
+}
 
 /**
  * Azure append-blob Appender writing the logs to a Azure Storage append-blob file. 
@@ -39,33 +47,45 @@ export interface AzureAppendBlobAppenderOptions extends log4js_.AppenderConfigBa
  * @param timezoneOffset - optional timezone offset in minutes (default system local)
  */
 export function appender(
-  cstr: string,
+  azureStorageConnectionString: string,
   container: string,
-  blobName: string,
+  appendBlob: string,
   layout: log4js_.Layout): log4js_.Appender {
 
-  var blob = azure_.createBlobService(cstr);
+  validateField("azureStorageConnectionString", azureStorageConnectionString);
+  validateField("container", container);
+  validateField("appendBlob", appendBlob);
+  if (layout == null) layout = log4js_.layouts.basicLayout;
+
+  var blob = azure_.createBlobService(azureStorageConnectionString);
 
   blob.createContainerIfNotExists(container, function (error, result, response) {
     if (error) throw error;
   });
 
-  var writer = new assistant_.AzureAppendBlobAssistant(blob, container, blobName);
+  var writer = new assistant_.AzureAppendBlobAssistant(blob, container, appendBlob);
 
-  return function azureAppendBlobWriter(evt: log4js_.LogEvent): void {
+  function azureAppendBlobWriter(evt: log4js_.LogEvent): void {
     if (evt == null) return;
 
+    var cb = this.callback;
     var text: string;
     try {
       text = layout(evt);
     } catch (e) {
-      throw (e instanceof Error) ? e : new Error(e);
+      var error = (e instanceof Error) ? e : new Error(e);
+      setTimeout(cb, 0, error, null, null);
+      return;
     }
 
-    writer.writeText(text, function (e, result, response) {
-      if (e) throw e;
-    });
+    writer.writeText(text, cb);
   }
+
+  (<any>azureAppendBlobWriter).callback = <azure_.ErrorOrResult<azure_.BlobService.BlobResult>>function (e, r, res) {
+    if (e) throw e;
+  };
+
+  return azureAppendBlobWriter;
 }
 
 export var name = "azure-append-blob-appender";
@@ -74,15 +94,6 @@ export function configure(config: AzureAppendBlobAppenderOptions): log4js_.Appen
 
   if (config == null || typeof config !== 'object') {
     throw new Error('Missing required configuration');
-  }
-
-  function validateField(name: string, value: string) {
-    var _v = value;
-    if (_v == null
-      || typeof _v !== 'string'
-      || _v.length <= 0) {
-      throw new TypeError("[" + _v + "] must be a valid string but get " + config.azureStorageConnectionString);
-    }
   }
 
   validateField("azureStorageConnectionString", config.azureStorageConnectionString);

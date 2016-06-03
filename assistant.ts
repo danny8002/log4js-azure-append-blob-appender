@@ -18,8 +18,12 @@ export class AzureAppendBlobAssistant {
      */
     public writeText(
         text: string,
-        cb: azure_.ErrorOrResult<azure_.BlobService.BlobResult>): void {
+        callback: azure_.ErrorOrResult<azure_.BlobService.BlobResult>): void {
         var self = this;
+
+        var cb: azure_.ErrorOrResult<azure_.BlobService.BlobResult> = function (e, r, res) {
+            setTimeout(callback, 0, e, r, res);
+        }
 
         text = text + eol;
         if (self._checked) return self.blob.appendFromText(self.container, self.blobName, text, cb);
