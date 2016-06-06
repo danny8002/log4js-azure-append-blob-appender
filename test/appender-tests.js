@@ -1,25 +1,46 @@
 var log4js = require('log4js');
 var assert = require('assert');
-
+var util = require("util");
 
 function getCfg() {
-    var cstrKey = "TEST_AZURE_STORAGE_CS";
-    var containerKey = "TEST_AZURE_CONTAINER";
-    var blobKey = "TEST_AZURE_APPEND_BLOB";
+    var ACCOUNT = "TEST_AZURE_STORAGE_ACCOUNT";
+    var ACCESS_KEY = "TEST_AZURE_STORAGE_KEY";
+    var CONTAINER_KEY = "TEST_AZURE_CONTAINER";
+    var BLOB_KEY = "TEST_AZURE_APPEND_BLOB";
 
     var v = {
         "type": "log4js-azure-append-blob-appender",
         "category": "RunService2",
-        "azureStorageConnectionString": "DefaultEndpointsProtocol=https;AccountName=satoriportal;AccountKey=grK05JBcKN9ucKR7XCPjyMv7GqWsdR3hhnE2DSyUbWmL5lsAF6F7KGTY7a0PaL/4ZieQRVm6076Uw7p3E6XcCQ==",
+        "azureStorageConnectionString": "",
         "container": "log4test",
         "appendBlob": "my.log"
     }
 
     var env = process.env;
+    var account = env[ACCOUNT];
+    if (account == null || typeof account !== 'string' || account.length <= 0) {
+        throw new Error("Cannot get Azure Storage Account from process.env with Key=" + ACCOUNT);
+    }
 
-    if (env[cstrKey]) v.azureStorageConnectionString = env[cstrKey];
-    if (env[containerKey]) v.container = env[containerKey];
-    if (env[blobKey]) v.appendBlob = env[blobKey];
+    var key = env[ACCESS_KEY];
+    if (key == null || typeof key !== 'string' || key.length <= 0) {
+        throw new Error("Cannot get Azure Storage Account from process.env with Key=" + ACCESS_KEY);
+    }
+
+    var container = env[CONTAINER_KEY];
+    if (container == null || typeof container !== 'string' || container.length <= 0) {
+        throw new Error("Cannot get Azure Storage Account from process.env with Key=" + CONTAINER_KEY);
+    }
+
+    var blobName = env[BLOB_KEY];
+    if (blobName == null || typeof blobName !== 'string' || blobName.length <= 0) {
+        throw new Error("Cannot get Azure Storage Account from process.env with Key=" + BLOB_KEY);
+    }
+
+    v.azureStorageConnectionString = util.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s", account, key);
+
+    v.container = container;
+    v.appendBlob = blobName;
 
     return v;
 }
@@ -43,7 +64,7 @@ describe("test-azure-append-blob-appender", function () {
         appender = ctor(cfg.azureStorageConnectionString, cfg.container, cfg.appendBlob, log4js.layouts.basicLayout);
 
         log4js.addAppender(appender);
-        
+
         done();
     })
 
