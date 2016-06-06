@@ -90,7 +90,7 @@ describe("validation-test", function () {
         done();
     })
 
-    it("invalid-config-object", function (done) {
+    it("invalid-config-object", function () {
         assert.throws(function () {
             appenderModule.configure(null);
         }, function (e) {
@@ -98,7 +98,7 @@ describe("validation-test", function () {
         }, "Unexcepted error");
     })
 
-    it("invalid-azure-storage-connection-string", function (done) {
+    it("invalid-azure-storage-connection-string", function () {
 
         assert.throws(function () {
             appender = ctor("", cfg.container, cfg.appendBlob, usedLayout);
@@ -119,7 +119,7 @@ describe("validation-test", function () {
         }, "unexpected error");
     })
 
-    it("invalid-container-string", function (done) {
+    it("invalid-container-string", function () {
         assert.throws(function () {
             appender = ctor(cfg.azureStorageConnectionString, "", cfg.appendBlob, usedLayout);
         }, function (e) {
@@ -133,7 +133,7 @@ describe("validation-test", function () {
         }, "unexpected error");
     })
 
-    it("invalid-blob-string", function (done) {
+    it("invalid-blob-string", function () {
         assert.throws(function () {
             appender = ctor(cfg.azureStorageConnectionString, cfg.container, 555, usedLayout);
         }, function (e) {
@@ -162,9 +162,9 @@ describe("layout-test", function () {
     before(function (done) {
         cfg = getCfg();
         appenderModule = reloadModule();
-        log4js.loadAppender(name, appenderModule);
+        log4js.loadAppender(NAME, appenderModule);
 
-        var ctor = log4js.appenders[name];
+        var ctor = log4js.appenders[NAME];
 
         appender = ctor(cfg.azureStorageConnectionString, cfg.container, cfg.appendBlob, customLayout);
 
