@@ -2,136 +2,25 @@ var log4js = require('log4js');
 var assert = require('assert');
 var util = require("util");
 
-function getCfg() {
-    var ACCOUNT = "TEST_AZURE_STORAGE_ACCOUNT";
-    var ACCESS_KEY = "TEST_AZURE_STORAGE_KEY";
-    var CONTAINER_KEY = "TEST_AZURE_CONTAINER";
-    var BLOB_KEY = "TEST_AZURE_APPEND_BLOB";
+var getCfg = require("./config").getCfg;
 
-    var v = {
-        "type": "log4js-azure-append-blob-appender",
-        "category": "RunService2",
-        "azureStorageConnectionString": "",
-        "container": "log4jsappenderpackage",
-        "appendBlob": "log4jsappenderpackage.log",
-        "layout": {
-            "type": "basic"
-        }
-    }
+var NAME = require("./config").NAME;
 
-    var env = process.env;
-    var account = env[ACCOUNT];
-    if (account == null || typeof account !== 'string' || account.length <= 0) {
-        throw new Error("Cannot get Azure Storage Account from process.env with Key=" + ACCOUNT);
-    }
-
-    var key = env[ACCESS_KEY];
-    if (key == null || typeof key !== 'string' || key.length <= 0) {
-        throw new Error("Cannot get Azure Storage Account from process.env with Key=" + ACCESS_KEY);
-    }
-
-    var container = env[CONTAINER_KEY];
-    if (container == null || typeof container !== 'string' || container.length <= 0) {
-        throw new Error("Cannot get Azure Storage Account from process.env with Key=" + CONTAINER_KEY);
-    }
-
-    var blobName = env[BLOB_KEY];
-    if (blobName == null || typeof blobName !== 'string' || blobName.length <= 0) {
-        throw new Error("Cannot get Azure Storage Account from process.env with Key=" + BLOB_KEY);
-    }
-
-    v.azureStorageConnectionString = util.format("DefaultEndpointsProtocol=https;AccountName=%s;AccountKey=%s", account, key);
-
-    v.container = container;
-    v.appendBlob = blobName;
-
-    return v;
-}
-
-
-var NAME = "log4js-azure-append-blob-appender";
-
-var appenderModule = require("../../" + NAME);
-
-describe("normal-appender-ctor-test", function () {
-    var cfg = null;
-    var appender = null;
-    var log = null;
-
-    before(function (done) {
-        cfg = getCfg();
-
-        log4js.loadAppender(NAME, appenderModule);
-
-        var ctor = log4js.appenders[NAME];
-
-        appender = ctor(cfg.azureStorageConnectionString, cfg.container, cfg.appendBlob, log4js.layouts.basicLayout);
-
-        log4js.addAppender(appender);
-
-        log = log4js.getLogger();
-
-        done();
-    })
-
-    it("write log to azure", function (done) {
-        assert.notEqual(appender, null);
-        assert.notEqual(log, null);
-
-        appender.callback = function (e, r, res) {
-            if (e) {
-                console.log(util.inspect(e));
-                assert.equal(e, null);
-                done();
-            } else {
-                console.log("======= sucessfull back information from azure =========");
-                console.log(r);
-                console.log("=========================================================");
-                assert.notEqual(r, null);
-                done();
-            }
-        };
-
-
-        log.debug("test data1", "data1");
-    })
-
-    it("write log to azure the second time", function (done) {
-        assert.notEqual(appender, null);
-        assert.notEqual(log, null);
-
-        appender.callback = function (e, r, res) {
-            if (e) {
-                assert.equal(e, null);
-                done();
-            } else {
-                console.log("======= sucessfull back information from azure =========");
-                console.log(r);
-                console.log("=========================================================");
-                assert.notEqual(r, null);
-                done();
-            }
-        };
-
-        log.info("test data2", "data2");
-    })
-
-});
+var reloadModule = require("./config").reloadModule;
 
 describe("normal-configure-test", function () {
     var cfg = null;
     var appender = null;
     var log = null;
-
+    var appenderModule = null;
     before(function (done) {
         cfg = getCfg();
+        appenderModule = reloadModule();
 
-        var appender = appenderModule.configure(cfg);
+        appender = appenderModule.configure(cfg);
 
         log4js.addAppender(appender);
 
-        appender = log4js[NAME];
-
         log = log4js.getLogger();
 
         done();
@@ -180,70 +69,9 @@ describe("normal-configure-test", function () {
 
 });
 
-describe("normal-log4js-configure-test", function () {
-    var cfg = null;
-    var appender = null;
-    var log = null;
-
-    before(function (done) {
-        cfg = getCfg();
-
-        log4js.configure({ "appenders:": [cfg] });
-
-        // var appender = appenderModule.configure(cfg);
-
-        // log4js.addAppender(appender);
-
-        log = log4js.getLogger();
-
-        done();
-    })
-
-    it("write log to azure", function (done) {
-        assert.notEqual(appender, null);
-        assert.notEqual(log, null);
-
-        appender.callback = function (e, r, res) {
-            if (e) {
-                console.log(util.inspect(e));
-                assert.equal(e, null);
-                done();
-            } else {
-                console.log("======= sucessfull back information from azure =========");
-                console.log(r);
-                console.log("=========================================================");
-                assert.notEqual(r, null);
-                done();
-            }
-        };
-
-
-        log.debug("test data1", "data1");
-    })
-
-    it("write log to azure the second time", function (done) {
-        assert.notEqual(appender, null);
-        assert.notEqual(log, null);
-
-        appender.callback = function (e, r, res) {
-            if (e) {
-                assert.equal(e, null);
-                done();
-            } else {
-                console.log("======= sucessfull back information from azure =========");
-                console.log(r);
-                console.log("=========================================================");
-                assert.notEqual(r, null);
-                done();
-            }
-        };
-
-        log.info("test data2", "data2");
-    })
-
-});
 
 describe("validation-test", function () {
+    var appenderModule = null;
     var cfg = null;
     var ctor = null;
     var appender = null;
@@ -252,6 +80,8 @@ describe("validation-test", function () {
 
     before(function (done) {
         cfg = getCfg();
+
+        appenderModule = reloadModule();
 
         log4js.loadAppender(NAME, appenderModule);
 
@@ -319,6 +149,7 @@ describe("validation-test", function () {
 });
 
 describe("layout-test", function () {
+    var appenderModule = null;
     var cfg = null;
     var appender = null;
     var log = null;
@@ -330,7 +161,7 @@ describe("layout-test", function () {
 
     before(function (done) {
         cfg = getCfg();
-
+        appenderModule = reloadModule();
         log4js.loadAppender(name, appenderModule);
 
         var ctor = log4js.appenders[name];
