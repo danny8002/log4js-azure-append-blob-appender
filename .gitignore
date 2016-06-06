@@ -11,4 +11,5 @@ coverage
 *.js
 !gruntfile.js
 
+!test/*
 !*-tests.js
