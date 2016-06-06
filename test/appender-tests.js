@@ -12,8 +12,8 @@ function getCfg() {
         "type": "log4js-azure-append-blob-appender",
         "category": "RunService2",
         "azureStorageConnectionString": "",
-        "container": "log4test",
-        "appendBlob": "my.log"
+        "container": "log4jsappenderpackage",
+        "appendBlob": "log4jsappenderpackage.log"
     }
 
     var env = process.env;
@@ -76,6 +76,9 @@ describe("test-azure-append-blob-appender", function () {
                 assert.equal(e, null);
                 done();
             } else {
+                console.log("======= sucessfull back information from azure =========");
+                console.log(r);
+                console.log("=========================================================");
                 assert.notEqual(r, null);
                 done();
             }
@@ -83,8 +86,6 @@ describe("test-azure-append-blob-appender", function () {
 
         var log = log4js.getLogger();
         log.debug("test data2", "data1");
-
-        done();
     })
 });
 
