@@ -13,3 +13,5 @@ coverage/
 
 # Test #
 test/
+
+gruntfile.js
