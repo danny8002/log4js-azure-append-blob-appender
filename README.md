@@ -1,8 +1,9 @@
 # log4js-azure-append-blob-appender
 
 [![Build Status](https://travis-ci.org/danny8002/log4js-azure-append-blob-appender.svg?branch=master)](https://travis-ci.org/danny8002/log4js-azure-append-blob-appender)
+[![Coverage Status](https://coveralls.io/repos/github/danny8002/log4js-azure-append-blob-appender/badge.svg?branch=master)](https://coveralls.io/github/danny8002/log4js-azure-append-blob-appender?branch=master)
 
-Write log to Microsoft Azure Storage (append blob) 
+Write log to Microsoft Azure Storage (append blob)
 
 # You should known when use this appender
 
