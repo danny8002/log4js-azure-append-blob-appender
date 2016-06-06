@@ -32,6 +32,13 @@ function validateField(name: string, value: string) {
   }
 }
 
+export interface AppenderWithHandler extends log4js_.Appender {
+  callback: azure_.ErrorOrResult<azure_.BlobService.BlobResult>;
+}
+
+function defaultHandler(e: Error, r: azure_.BlobService.BlobResult, res: azure_.ServiceResponse) {
+  if (e) throw e;
+}
 /**
  * Azure append-blob Appender writing the logs to a Azure Storage append-blob file. 
  * // TODO: auto rolling if https://azure.microsoft.com/en-us/documentation/articles/storage-scalability-targets/
@@ -65,10 +72,10 @@ export function appender(
 
   var writer = new assistant_.AzureAppendBlobAssistant(blob, container, appendBlob);
 
-  function azureAppendBlobWriter(evt: log4js_.LogEvent): void {
+  var appenderWriter = <AppenderWithHandler>function (evt: log4js_.LogEvent): void {
     if (evt == null) return;
 
-    var cb = this.callback;
+    var cb = appenderWriter.callback || defaultHandler;
     var text: string;
     try {
       text = layout(evt);
@@ -81,11 +88,9 @@ export function appender(
     writer.writeText(text, cb);
   }
 
-  (<any>azureAppendBlobWriter).callback = <azure_.ErrorOrResult<azure_.BlobService.BlobResult>>function (e, r, res) {
-    if (e) throw e;
-  };
+  appenderWriter.callback = defaultHandler;
 
-  return azureAppendBlobWriter;
+  return appenderWriter;
 }
 
 export var name = "azure-append-blob-appender";
@@ -117,9 +122,4 @@ export function configure(config: AzureAppendBlobAppenderOptions): log4js_.Appen
 
 export function shutdown(cb: (error: Error) => void): void {
   return cb(null);
-}
-
-function loadSelfModule(): any {
-  var file = __filename;
-  return require(file);
 }

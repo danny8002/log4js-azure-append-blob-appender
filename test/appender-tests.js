@@ -7,7 +7,6 @@ function getCfg() {
     var containerKey = "TEST_AZURE_CONTAINER";
     var blobKey = "TEST_AZURE_APPEND_BLOB";
 
-
     var v = {
         "type": "log4js-azure-append-blob-appender",
         "category": "RunService2",
@@ -15,7 +14,7 @@ function getCfg() {
         "container": "log4test",
         "appendBlob": "my.log"
     }
-    
+
     var env = process.env;
 
     if (env[cstrKey]) v.azureStorageConnectionString = env[cstrKey];
@@ -30,16 +29,47 @@ var name = "log4js-azure-append-blob-appender";
 
 var appenderModule = require("../../" + name);
 
-var cfg = getCfg();
+describe("test-azure-append-blob-appender", function () {
+    var cfg = null;
+    var appender = null;
 
-log4js.loadAppender(name, appenderModule);
+    before(function (done) {
+        cfg = getCfg();
 
-var ctor = log4js.appenders[name];
+        log4js.loadAppender(name, appenderModule);
 
-var appender = ctor(cfg.azureStorageConnectionString, cfg.container, cfg.appendBlob, log4js.layouts.basicLayout);
+        var ctor = log4js.appenders[name];
 
-log4js.addAppender(appender);
+        appender = ctor(cfg.azureStorageConnectionString, cfg.container, cfg.appendBlob, log4js.layouts.basicLayout);
 
-var log = log4js.getLogger();
+        log4js.addAppender(appender);
+        
+        done();
+    })
 
-log.debug("test data", "data1");
+    it("write log to azure", function (done) {
+        assert.notEqual(appender, null);
+
+        appender.callback = function (e, r, res) {
+            if (e) {
+                assert.equal(e, null);
+                done();
+            } else {
+                assert.notEqual(r, null);
+                done();
+            }
+        };
+
+        var log = log4js.getLogger();
+        log.debug("test data2", "data1");
+
+        done();
+    })
+});
+
+
+
+
+
+
+

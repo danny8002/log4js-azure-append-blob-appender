@@ -2,6 +2,7 @@ obj
 objd
 
 node_modules
+coverage
 .idea
 .vs
 .tscache
