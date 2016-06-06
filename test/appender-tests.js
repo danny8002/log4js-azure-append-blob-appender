@@ -13,7 +13,10 @@ function getCfg() {
         "category": "RunService2",
         "azureStorageConnectionString": "",
         "container": "log4jsappenderpackage",
-        "appendBlob": "log4jsappenderpackage.log"
+        "appendBlob": "log4jsappenderpackage.log",
+        "layout": {
+            "type": "basic"
+        }
     }
 
     var env = process.env;
@@ -46,30 +49,56 @@ function getCfg() {
 }
 
 
-var name = "log4js-azure-append-blob-appender";
+var NAME = "log4js-azure-append-blob-appender";
 
-var appenderModule = require("../../" + name);
+var appenderModule = require("../../" + NAME);
 
-describe("test-azure-append-blob-appender", function () {
+describe("normal-appender-ctor-test", function () {
     var cfg = null;
     var appender = null;
+    var log = null;
 
     before(function (done) {
         cfg = getCfg();
 
-        log4js.loadAppender(name, appenderModule);
+        log4js.loadAppender(NAME, appenderModule);
 
-        var ctor = log4js.appenders[name];
+        var ctor = log4js.appenders[NAME];
 
         appender = ctor(cfg.azureStorageConnectionString, cfg.container, cfg.appendBlob, log4js.layouts.basicLayout);
 
         log4js.addAppender(appender);
+
+        log = log4js.getLogger();
 
         done();
     })
 
     it("write log to azure", function (done) {
         assert.notEqual(appender, null);
+        assert.notEqual(log, null);
+
+        appender.callback = function (e, r, res) {
+            if (e) {
+                console.log(util.inspect(e));
+                assert.equal(e, null);
+                done();
+            } else {
+                console.log("======= sucessfull back information from azure =========");
+                console.log(r);
+                console.log("=========================================================");
+                assert.notEqual(r, null);
+                done();
+            }
+        };
+
+
+        log.debug("test data1", "data1");
+    })
+
+    it("write log to azure the second time", function (done) {
+        assert.notEqual(appender, null);
+        assert.notEqual(log, null);
 
         appender.callback = function (e, r, res) {
             if (e) {
@@ -84,12 +113,261 @@ describe("test-azure-append-blob-appender", function () {
             }
         };
 
-        var log = log4js.getLogger();
-        log.debug("test data2", "data1");
+        log.info("test data2", "data2");
+    })
+
+});
+
+describe("normal-configure-test", function () {
+    var cfg = null;
+    var appender = null;
+    var log = null;
+
+    before(function (done) {
+        cfg = getCfg();
+
+        var appender = appenderModule.configure(cfg);
+
+        log4js.addAppender(appender);
+
+        appender = log4js[NAME];
+
+        log = log4js.getLogger();
+
+        done();
+    })
+
+    it("write log to azure", function (done) {
+        assert.notEqual(appender, null);
+        assert.notEqual(log, null);
+
+        appender.callback = function (e, r, res) {
+            if (e) {
+                console.log(util.inspect(e));
+                assert.equal(e, null);
+                done();
+            } else {
+                console.log("======= sucessfull back information from azure =========");
+                console.log(r);
+                console.log("=========================================================");
+                assert.notEqual(r, null);
+                done();
+            }
+        };
+
+        log.debug("test data1", "data1");
+    })
+
+    it("write log to azure the second time", function (done) {
+        assert.notEqual(appender, null);
+        assert.notEqual(log, null);
+
+        appender.callback = function (e, r, res) {
+            if (e) {
+                assert.equal(e, null);
+                done();
+            } else {
+                console.log("======= sucessfull back information from azure =========");
+                console.log(r);
+                console.log("=========================================================");
+                assert.notEqual(r, null);
+                done();
+            }
+        };
+
+        log.info("test data2", "data2");
+    })
+
+});
+
+describe("normal-log4js-configure-test", function () {
+    var cfg = null;
+    var appender = null;
+    var log = null;
+
+    before(function (done) {
+        cfg = getCfg();
+
+        log4js.configure({ "appenders:": [cfg] });
+
+        // var appender = appenderModule.configure(cfg);
+
+        // log4js.addAppender(appender);
+
+        log = log4js.getLogger();
+
+        done();
+    })
+
+    it("write log to azure", function (done) {
+        assert.notEqual(appender, null);
+        assert.notEqual(log, null);
+
+        appender.callback = function (e, r, res) {
+            if (e) {
+                console.log(util.inspect(e));
+                assert.equal(e, null);
+                done();
+            } else {
+                console.log("======= sucessfull back information from azure =========");
+                console.log(r);
+                console.log("=========================================================");
+                assert.notEqual(r, null);
+                done();
+            }
+        };
+
+
+        log.debug("test data1", "data1");
+    })
+
+    it("write log to azure the second time", function (done) {
+        assert.notEqual(appender, null);
+        assert.notEqual(log, null);
+
+        appender.callback = function (e, r, res) {
+            if (e) {
+                assert.equal(e, null);
+                done();
+            } else {
+                console.log("======= sucessfull back information from azure =========");
+                console.log(r);
+                console.log("=========================================================");
+                assert.notEqual(r, null);
+                done();
+            }
+        };
+
+        log.info("test data2", "data2");
+    })
+
+});
+
+describe("validation-test", function () {
+    var cfg = null;
+    var ctor = null;
+    var appender = null;
+    var log = null;
+    var usedLayout = log4js.layouts.basicLayout;
+
+    before(function (done) {
+        cfg = getCfg();
+
+        log4js.loadAppender(NAME, appenderModule);
+
+        ctor = log4js.appenders[NAME];
+
+        done();
+    })
+
+    it("invalid-config-object", function (done) {
+        assert.throws(function () {
+            appenderModule.configure(null);
+        }, function (e) {
+            return e instanceof Error;
+        }, "Unexcepted error");
+    })
+
+    it("invalid-azure-storage-connection-string", function (done) {
+
+        assert.throws(function () {
+            appender = ctor("", cfg.container, cfg.appendBlob, usedLayout);
+        }, function (e) {
+            return e instanceof Error;
+        }, "unexpected error");
+
+        assert.throws(function () {
+            appender = ctor(555, cfg.container, cfg.appendBlob, usedLayout);
+        }, function (e) {
+            return e instanceof Error;
+        }, "unexpected error");
+
+        assert.throws(function () {
+            appender = ctor("bad connection string", cfg.container, cfg.appendBlob, usedLayout);
+        }, function (e) {
+            return e instanceof Error;
+        }, "unexpected error");
+    })
+
+    it("invalid-container-string", function (done) {
+        assert.throws(function () {
+            appender = ctor(cfg.azureStorageConnectionString, "", cfg.appendBlob, usedLayout);
+        }, function (e) {
+            return e instanceof Error;
+        }, "unexpected error");
+
+        assert.throws(function () {
+            appender = ctor(cfg.azureStorageConnectionString, 555, cfg.appendBlob, usedLayout);
+        }, function (e) {
+            return e instanceof Error;
+        }, "unexpected error");
+    })
+
+    it("invalid-blob-string", function (done) {
+        assert.throws(function () {
+            appender = ctor(cfg.azureStorageConnectionString, cfg.container, 555, usedLayout);
+        }, function (e) {
+            return e instanceof Error;
+        }, "unexpected error");
+
+        assert.throws(function () {
+            appender = ctor(cfg.azureStorageConnectionString, cfg.container, "", usedLayout);
+        }, function (e) {
+            return e instanceof Error;
+        }, "unexpected error");
     })
 });
 
+describe("layout-test", function () {
+    var cfg = null;
+    var appender = null;
+    var log = null;
 
+    var ERROR_FROM_LAYOUT = "Error from customLayout";
+    function customLayout(evt) {
+        throw new TypeError(ERROR_FROM_LAYOUT);
+    }
+
+    before(function (done) {
+        cfg = getCfg();
+
+        log4js.loadAppender(name, appenderModule);
+
+        var ctor = log4js.appenders[name];
+
+        appender = ctor(cfg.azureStorageConnectionString, cfg.container, cfg.appendBlob, customLayout);
+
+        log4js.addAppender(appender);
+
+        log = log4js.getLogger();
+
+        done();
+    })
+
+    it("layout-throw-exception", function (done) {
+        assert.notEqual(appender, null);
+        assert.notEqual(log, null);
+
+        appender.callback = function (e, r, res) {
+            if (e) {
+                console.log(util.inspect(e));
+                assert.equal(e.message, ERROR_FROM_LAYOUT);
+                done();
+            } else {
+                console.log("======= sucessfull back information from azure =========");
+                console.log(r);
+                console.log("=========================================================");
+                assert.notEqual(r, null);
+                done();
+            }
+        };
+
+
+        log.debug("test data1", "data1");
+    })
+
+
+});
 
 
 
