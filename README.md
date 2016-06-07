@@ -5,7 +5,7 @@
 [![NPM version](https://badge.fury.io/js/log4js-azure-append-blob-appender.svg)](http://badge.fury.io/js/log4js-azure-append-blob-appender) 
 Write log to Microsoft Azure Storage (append blob)
 
-# You should known when use this appender
+# You should know when use this appender
 
 - if Azure Storage blob container do not exist, create it
 - if Azure Storage blob do not exist, create it
