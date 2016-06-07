@@ -67,3 +67,11 @@ Write json (instead of plain text) as every log line, so you can do more things 
 - [log4js-json-layout](https://www.npmjs.com/package/log4js-json-layout)
 
 # Update log
+ - 1.0.1 (June 07 2016)
+    - improve test
+    - add gemfury version tag in readme.md
+ - 1.0.0 (June 06 2016)
+   - azure append validation
+   - add test, improve readme
+ - 0.0.1 (June 02 2016)
+    - basic appender implement
