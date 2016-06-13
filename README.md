@@ -1,5 +1,6 @@
 # log4js-azure-append-blob-appender
 
+[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 [![Build Status](https://travis-ci.org/danny8002/log4js-azure-append-blob-appender.svg?branch=master)](https://travis-ci.org/danny8002/log4js-azure-append-blob-appender)
 [![Coverage Status](https://coveralls.io/repos/github/danny8002/log4js-azure-append-blob-appender/badge.svg?branch=master)](https://coveralls.io/github/danny8002/log4js-azure-append-blob-appender?branch=master)
 [![NPM version](https://badge.fury.io/js/log4js-azure-append-blob-appender.svg)](http://badge.fury.io/js/log4js-azure-append-blob-appender) 
@@ -65,6 +66,7 @@ This appender is **compitable** with log4js configuration file. for example, in 
 # Best Practice about this appender
 Write json (instead of plain text) as every log line, so you can do more things (eg. use HDInsight to analyse log)
 - [log4js-json-layout](https://www.npmjs.com/package/log4js-json-layout)
+- [string-json-format](https://github.com/danny8002/string-format-json)
 
 # Update log
  - 1.0.1 (June 07 2016)
